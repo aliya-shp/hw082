@@ -20,20 +20,14 @@ const upload = multer({storage});
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-    let artist = req.query.artist;
-    console.log(artist);
 
-    let albums;
-
-    if (artist) {
-        albums = await Album.findById(artist).populate('artist');
-        console.log(albums);
+    if (req.query.artist) {
+        const albumsByArtist = await Album.find({artist: req.query.artist}).populate('artist');
+        return res.send(albumsByArtist);
     } else {
-        albums = await Album.find();
-        console.log(albums);
+        const albums = await Album.find();
+        return res.send(albums);
     }
-
-    return res.send(albums);
 });
 
 
@@ -56,6 +50,20 @@ router.post('/', upload.single('image'), async (req, res) => {
         return res.send({id: album._id});
     } catch (e) {
         return res.status(400).send(e);
+    }
+});
+
+router.get('/:id', async (req, res) => {
+    try {
+        const album = await Album.findById(req.params.id).populate('artist');
+
+        if (!album) {
+            return res.status(404).send({message: 'Not found'});
+        }
+
+        res.send(album);
+    } catch (e) {
+        res.status(404).send({message: 'Not found'});
     }
 });
 
