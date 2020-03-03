@@ -22,7 +22,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
 
     if (req.query.artist) {
-        const albumsByArtist = await Album.find({artist: req.query.artist}).populate('artist');
+        const albumsByArtist = await Album.find({artist: req.query.artist}).populate('artist', 'name');
         return res.send(albumsByArtist);
     } else {
         const albums = await Album.find();
